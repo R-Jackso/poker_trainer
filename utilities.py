@@ -85,8 +85,8 @@ class Hand:
         )
         
 def draw():
-    selectedCard = random.choice(cardBank)
-    fetchAsset(selectedCard, True, True)
+    selectedCard = f"{random.choice(cardBank)}.png"
+    return fetchAsset(selectedCard, True, True)
 
 def fetchAsset(assetPath, open=False, card=False):
     if card:

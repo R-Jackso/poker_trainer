@@ -1,14 +1,31 @@
 import customtkinter as ctk
-from utilities import BASE_DIR, fetchAsset
+from utilities import BASE_DIR, fetchAsset, Hand
 
 # Functional ----------------------------------------------------------------------------------------------------------
 
 rootWidth = 800
 rootHeight = 1200
+hands = []
+
+def deal(master):
+    hands.append(Hand(master=master, relx=0.5, rely=0.85))
+    hands.append(Hand(master=master, relx=0.15, rely=0.7))
+    hands.append(Hand(master=master, relx=0.15, rely=0.3))
+    hands.append(Hand(master=master, relx=0.5, rely=0.15))
+    hands.append(Hand(master=master, relx=0.85, rely=0.7))
+    hands.append(Hand(master=master, relx=0.85, rely=0.3))
 
 def onResize(event):
     rootWidth = root.winfo_width()
     rootHeight = root.winfo_height()
+
+def goAgain():
+    global hands
+    for hand in hands:
+        hand.frame.destroy()
+    hands.clear()
+    
+    deal(root)
 
 # UI ------------------------------------------------------------------------------------------------------------------
 
@@ -41,70 +58,24 @@ bg_label.place(
     relheight=1
     )
 
-# card frame
+# hands (initial creation)
+deal(root)
 
-playerHandFrame = ctk.CTkFrame(
-    master=root, 
-    width=135,
-    height=95, 
-    corner_radius=0, 
-    border_width=2, 
-    border_color="#ffffff"
-    )
-
-playerHandFrame.grid_propagate(False)
-
-playerHandFrame.place(
-    relx=0.5,
-    rely=0.85,
-    anchor="center"
+# go again button
+goAgainButton = ctk.CTkButton(
+    master=root,
+    width=100,
+    height=50,
+    corner_radius=5,
+    command=goAgain,
+    text="Go Again"
 )
 
-# cards
-
-cardOne = ctk.CTkImage (
-    light_image=fetchAsset("2_of_clubs.png", True, True), 
-    dark_image=fetchAsset("2_of_clubs.png", True, True), 
-    size=(50, 70)
-    )
-cardTwo = ctk.CTkImage (
-    light_image=fetchAsset("2_of_diamonds.png", True, True), 
-    dark_image=fetchAsset("2_of_diamonds.png", True, True), 
-    size=(50, 70)
-    )
-
-cardOneFrame = ctk.CTkLabel(
-    master=playerHandFrame, 
-    width=50,
-    height=85, 
-    corner_radius=5, 
-    fg_color="#ffffff",
-    image=cardOne,
-    text=""
-    )
-cardTwoFrame = ctk.CTkLabel(
-    master=playerHandFrame, 
-    width=50,
-    height=85, 
-    corner_radius=5, 
-    fg_color="#ffffff",
-    image=cardTwo,
-    text=""
-    )
-
-cardOneFrame.grid(
-    row=0,
+goAgainButton.grid(
+    row=0, 
     column=0,
-    sticky="nsw",
-    padx=(5, 2.5),
-    pady=5
-)
-cardTwoFrame.grid(
-    row=0,
-    column=1,
-    sticky="nse",
-    padx=(2.5, 5),
-    pady=5
-)
+    padx=20,
+    pady=20
+    )
 
 root.mainloop()
