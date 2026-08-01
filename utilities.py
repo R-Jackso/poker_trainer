@@ -25,70 +25,87 @@ cardBank = [
     "jack_of_spades", "queen_of_spades", "king_of_spades",
 ]
 
+deck = []
+
+class Card:
+    def __init__(self, master, bg_color, showing=True):
+        self.value = draw()
+        source = self.value if showing else fetchAsset("back.png")
+
+        self.image = ctk.CTkImage (
+            light_image=source,
+            dark_image=source,
+            size=(50, 70)
+            )
+
+        self.label = ctk.CTkLabel(
+            master=master,
+            width=50,
+            height=85,
+            corner_radius=5,
+            fg_color="#ffffff",
+            bg_color=bg_color,
+            image=self.image,
+            text=""
+            )
+
+    def grid(self, **kwargs):
+        self.label.grid(**kwargs)
+
+    def place(self, **kwargs):
+        self.label.place(**kwargs)
+
+    def reveal(self):
+        self.image = ctk.CTkImage(
+            light_image=self.value,
+            dark_image=self.value,
+            size=(50, 70)
+            )
+        self.label.configure(image=self.image)
+
 class Hand:
-    def __init__(self, master, relx, rely):
+    def __init__(self, master, showing=False):
         self.frame = ctk.CTkFrame(
             master=master,
             width=135,
             height=95,
-            corner_radius=0,
-            border_width=2,
-            border_color="#ffffff"
+            corner_radius=5,
+            border_width=0,
+            #border_color="#9A0C24"
         )
 
         self.frame.grid_propagate(False)
-        self.frame.place(relx=relx, rely=rely, anchor="center")
 
-        cardOne = ctk.CTkImage (
-            light_image=draw(), 
-            dark_image=draw(), 
-            size=(50, 70)
-            )
-        cardTwo = ctk.CTkImage (
-            light_image=draw(), 
-            dark_image=draw(), 
-            size=(50, 70)
-            )
-        
-        cardOneLabel = ctk.CTkLabel(
-            master=self.frame, 
-            width=50,
-            height=85, 
-            corner_radius=5, 
-            fg_color="#ffffff",
-            image=cardOne,
-            text=""
-            )
-        cardTwoLabel = ctk.CTkLabel(
-            master=self.frame, 
-            width=50,
-            height=85, 
-            corner_radius=5, 
-            fg_color="#ffffff",
-            image=cardTwo,
-            text=""
-            )
+        self.cardOne = Card(master=self.frame, bg_color="#2B2B2B", showing=showing)
+        self.cardTwo = Card(master=self.frame, bg_color="#2B2B2B", showing=showing)
 
-        cardOneLabel.grid(
+        self.cardOne.grid(
             row=0,
             column=0,
             sticky="nsw",
             padx=(5, 2.5),
             pady=5
         )
-        cardTwoLabel.grid(
+        self.cardTwo.grid(
             row=0,
             column=1,
             sticky="nse",
             padx=(2.5, 5),
             pady=5
         )
-        
-def draw():
-    selectedCard = f"{random.choice(cardBank)}.png"
-    return fetchAsset(selectedCard, True, True)
 
-def fetchAsset(assetPath, open=False, card=False):
+    def place(self, relx, rely):
+        self.frame.place(relx=relx, rely=rely, anchor="center")
+
+    def reveal(self):
+        self.cardOne.reveal()
+        self.cardTwo.reveal()
+
+def draw():
+    choice = deck.pop(random.randrange(len(deck)))
+    return fetchAsset(f"{choice}.png")
+
+def fetchAsset(assetPath, open=True, card=True):
     if card:
         fullPath = Path(BASE_DIR / "assets" / "cards" / assetPath)
     else:
@@ -98,3 +115,7 @@ def fetchAsset(assetPath, open=False, card=False):
         return Image.open(fullPath)
     else:
         return Path(fullPath)
+    
+def newDeck():
+    global deck
+    deck = cardBank.copy()
