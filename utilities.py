@@ -27,6 +27,15 @@ cardBank = [
 
 deck = []
 
+positionLabels = {
+    1 : "BTN",
+    2 : "SB",
+    3 : "BB",
+    4 : "UTG",
+    5 : "MP",
+    6 : "CO"
+}
+
 class Card:
     def __init__(self, master, bg_color, showing=True):
         self.value = draw()
@@ -100,6 +109,43 @@ class Hand:
     def reveal(self):
         self.cardOne.reveal()
         self.cardTwo.reveal()
+
+class Player:
+    def __init__(self, master, name, seat, position, chips=1000, isHero=False):
+        self.name = name
+        self.seat = seat
+        self.positionNumber = position
+        self.position = positionLabels[position]
+        self.chips = chips
+        self.isHero = isHero
+        self.hand = None
+
+        self.moneyLabel = ctk.CTkLabel(
+            master=master,
+            text=f"${self.chips}",
+            text_color="#ffffff",
+            fg_color="#2B2B2B",
+            corner_radius=5
+        )
+        self.moneyLabel.place(
+            relx=self.seat[0],
+            rely=self.seat[1],
+            anchor="n",
+            y=55
+        )
+
+    def advancePosition(self):
+        self.positionNumber = self.positionNumber % 6 + 1
+        self.position = positionLabels[self.positionNumber]
+
+    def dealHand(self, master):
+        if self.hand is not None:
+            self.hand.frame.destroy()
+        self.hand = Hand(master=master, showing=self.isHero)
+        self.hand.place(*self.seat)
+
+    def reveal(self):
+        self.hand.reveal()
 
 def draw():
     choice = deck.pop(random.randrange(len(deck)))
